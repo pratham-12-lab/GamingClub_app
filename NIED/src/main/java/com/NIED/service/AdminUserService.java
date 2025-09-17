@@ -4,6 +4,7 @@ import com.NIED.model.AdminUser;
 import com.NIED.repository.AdminUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Optional;
 
 @Service
@@ -12,12 +13,22 @@ public class AdminUserService {
     @Autowired
     private AdminUserRepository adminUserRepository;
 
+    // Correctly initialize BCryptPasswordEncoder as a class field
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     public AdminUser createAdminUser(AdminUser adminUser) {
-        // Here you can add logic like password hashing before saving
+        // Hash the plain text password before saving
+        String hashedPassword = passwordEncoder.encode(adminUser.getPassword());
+        adminUser.setPassword(hashedPassword);
         return adminUserRepository.save(adminUser);
     }
 
     public Optional<AdminUser> getAdminByUsername(String username) {
         return adminUserRepository.findByUsername(username);
+    }
+
+    // You can also add a method for password verification (e.g., login)
+    public boolean checkPassword(String plainPassword, String hashedPassword) {
+        return passwordEncoder.matches(plainPassword, hashedPassword);
     }
 }
