@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Optional;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Service
 public class AdminUserService {
@@ -30,5 +31,13 @@ public class AdminUserService {
     // You can also add a method for password verification (e.g., login)
     public boolean checkPassword(String plainPassword, String hashedPassword) {
         return passwordEncoder.matches(plainPassword, hashedPassword);
+    }
+    public boolean authenticate(String username, String password) {
+        Optional<AdminUser> adminUserOptional = adminUserRepository.findByUsername(username);
+        if (adminUserOptional.isPresent()) {
+            AdminUser adminUser = adminUserOptional.get();
+            return passwordEncoder.matches(password, adminUser.getPassword());
+        }
+        return false;
     }
 }
