@@ -18,8 +18,16 @@ public class AuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        
+        // --- ADDED LOGIC TO HANDLE PREFLIGHT REQUESTS ---
+        // Preflight requests use the OPTIONS method and do not contain an Authorization header.
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        // Skip authentication for the login endpoint
+        // --- EXISTING LOGIC ---
+        // Skip authentication for the login and register endpoints
         if (request.getRequestURI().equals("/api/admin/login") || request.getRequestURI().equals("/api/admin/register")) {
             filterChain.doFilter(request, response);
             return;
